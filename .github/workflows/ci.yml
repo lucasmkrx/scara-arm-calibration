@@ -21,3 +21,7 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Check the installed command
         run: scara-calibrate --input examples/sample.json --json
+      - name: Check generated figures
+        run: |
+          python scripts/generate_figures.py
+          git diff --exit-code -- docs/figures
