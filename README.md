@@ -113,6 +113,7 @@ examples/sample.json     reproducible example input
 tests/                   synthetic recovery, invalid input, CLI checks
 .github/workflows/ci.yml automated test matrix
 scripts/generate_figures.py reproducible SVG figures
+CHANGELOG.md            revision history and migration notes
 ```
 
 Run the checks locally:
@@ -122,4 +123,4 @@ python3 -m unittest discover -s tests -v
 python3 scripts/generate_figures.py
 ```
 
-The package has no runtime dependencies and is available under the [MIT license](LICENSE).
+See the [changelog](CHANGELOG.md) for the changes from the original implementation and the migration path. The package has no runtime dependencies and is available under the [MIT license](LICENSE).
