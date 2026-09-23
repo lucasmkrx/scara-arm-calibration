@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scara-arm-calibration"
+version = "0.1.0"
+description = "A dependency-free planar SCARA calibration solver and CLI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Lucas Marques"}]
+keywords = ["robotics", "calibration", "scara", "inverse-kinematics", "least-squares"]
+
+[project.scripts]
+scara-calibrate = "scara_arm_calibration.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["scara_arm_calibration*"]

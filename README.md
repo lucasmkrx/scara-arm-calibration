@@ -1,100 +1,35 @@
 # SCARA Arm Calibration
 
-This repository provides a Python-based calibration algorithm for a SCARA (Selective Compliance Articulated Robot Arm). The algorithm adjusts key variables to align the physical arm's position with a virtual model by minimizing the error between the two systems using a mathematical solver.
+A dependency-free Python package for fitting a planar two-link SCARA arm to paired measured and target XY positions. It estimates two link lengths, two joint reference angles, and the base position.
 
-## Project Overview
+## Quick start
 
-The calibration adjusts the following six variables:
-
-1. **Distal Arm Length**: Length of the distal arm, from the distal joint to the end-effector.
-2. **Distal Joint Angle**: Rotation angle at the distal joint, controlling distal arm movement.
-3. **Proximal Arm Length**: Length of the proximal arm, from the base to the distal joint.
-4. **Proximal Joint Angle**: Rotation angle at the proximal joint, controlling the proximal arm's movement.
-5. **Proximal Joint X Position**: X-coordinate of the proximal joint in a 2D plane, determining horizontal placement.
-6. **Proximal Joint Y Position**: Y-coordinate of the proximal joint in a 2D plane, determining vertical placement.
-
-![variables](https://github.com/user-attachments/assets/03d2e999-0a7c-4c14-84e9-0ee62090f2b8)
-
-The calibration process compares the real-world arm's X-Y coordinates with a virtual ideal model, then iteratively minimizes the difference (error) between the two by adjusting the six parameters. The goal is to ensure the SCARA arm positions accurately align with the virtual model.
-
-$$error = f(P^\circ, D^\circ, P_L, D_L, P_X, P_Y) = \sum_{pt=1}^{4} \sqrt{(Xpos_{pt} - Xtarget_{pt})^2 + (Ypos_{pt} - Ytarget_{pt})^2}$$
-
-## Features
-
-- Uses three or more reference points on the SCARA arm’s workspace.
-- Iteratively calculates and adjusts joint positions and arm lengths.
-- Mathematical solver minimizes the error between real-world and virtual model coordinates.
-
-## Installation
-
-Clone the repository and install the necessary dependencies:
+Python 3.10 or newer is required. From the repository root:
 
 ```bash
-git clone https://github.com/lucasgmx/scara-arm-calibration.git
-cd scara-arm-calibration
-pip install -r requirements.txt
+python3 -m scara_arm_calibration --input examples/sample.json
 ```
 
-## Usage
+The included four-point example reports an RMS position error of 1.1236 mm before fitting and 0.0137 mm after fitting. These are errors on the points used for calibration, not an independent hardware accuracy measurement.
 
-To run the calibration, use:
+Copy `examples/sample.json` to use your own nominal geometry, parameter ranges, and paired XY observations. At least four distinct, reachable measured points are required. Add `--json` for machine-readable results.
 
-```bash
-python3 main.py
-```
-
-## Parameter Adjustment Instructions
-
-To customize the calibration points and initial design values for your SCARA arm, edit the following sections in `main.py`:
-
-### Calibration Points
-
-Locate the section for calibration points in `main.py`:
+## Python API
 
 ```python
-###############################################################################
-# ENTER HERE THE COORDINATES OF THE CALIBRATION POINTS:
-###############################################################################
+from scara_arm_calibration import Arm, Observation, predict_position, solve_calibration
 
-class Points:
-    target = [
-        [50, 50],  # [x, y]
-        [50, 250],
-        [250, 250],
-        [250, 50],
-    ]
-
-    measured = [
-        [50.4, 49.2],  # [x, y]
-        [49.1, 248.7],
-        [249.1, 249.7],
-        [250.6, 49.3],
-    ]
+nominal = Arm(220, 220, -49, 166, 150, -50)
+pairs = [
+    Observation((50, 50), (50.4, 49.2)),
+    Observation((50, 250), (49.1, 248.7)),
+    Observation((250, 250), (249.1, 249.7)),
+    Observation((250, 50), (250.6, 49.3)),
+]
+result = solve_calibration(nominal, pairs)
+print(result.arm, result.final_rmse)
 ```
 
-- __target__: These are the ideal coordinates where the SCARA arm should reach.
-- __measured__: These coordinates represent the actual positions the SCARA arm reaches. Adjust these values based on your measurements during calibration.
+The solver infers the positive distal-angle joint branch from each measured point and fits the six parameters with bounded least squares. Validate the result on separate positions before applying it to a robot. The model covers planar positioning; it does not estimate Z-axis motion, tool orientation, backlash, or compliance.
 
-### Initial Design Values
-
-Next, locate the section for initial design values:
-
-```python
-###############################################################################
-# ENTER HERE THE INITIAL/DESIGN VALUES FOR THE ARM:
-###############################################################################
-
-class Initial:
-    P_length = 220  # proximal arm length in mm
-    D_length = 220  # distal arm length in mm
-    P_angle = -49  # position of the proximal endstop in degrees
-    D_angle = 166  # position of the distal endstop in degrees
-    P_positionX = 150  # position of the proximal joint in mm
-    P_positionY = -50  # position of the proximal joint in mm
-```
-
-Make sure to save your changes in `main.py` before running the calibration script.
-
-## More Information
-
-For more information about this project, visit my website: [SCARA Arm Project](https://www.lucasgmarques.com/projects/scara)
+The package has no runtime dependencies and is available under the [MIT license](LICENSE).

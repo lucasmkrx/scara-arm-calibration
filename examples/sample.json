@@ -1,0 +1,22 @@
+{
+  "unit": "mm",
+  "nominal_arm": {
+    "proximal_length": 220,
+    "distal_length": 220,
+    "proximal_angle": -49,
+    "distal_angle": 166,
+    "base_x": 150,
+    "base_y": -50
+  },
+  "parameter_ranges": {
+    "length": 10,
+    "angle": 10,
+    "base": 10
+  },
+  "observations": [
+    {"target": [50, 50], "measured": [50.4, 49.2]},
+    {"target": [50, 250], "measured": [49.1, 248.7]},
+    {"target": [250, 250], "measured": [249.1, 249.7]},
+    {"target": [250, 50], "measured": [250.6, 49.3]}
+  ]
+}
